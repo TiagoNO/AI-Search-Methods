@@ -1,35 +1,55 @@
-from sets import Set
 
 
-def getValidActions(map,map_height,map_width,position):
-    actions = {}
+def isAlreadyVisited(closed_list,state):
+    if closed_list.has_key((state[0],state[1],state[2])):
+        if closed_list[(state[0],state[1],state[2])][2] <= state[2]:
+            return True
+        else:
+            closed_list[(state[0],state[1],state[2])] = state
+            return False
+    else:
+        return False
 
-    if position[0] - 1 >= 0:
-        if map[position[0]-1][position[1]] == '.':
-            actions['w'] = 1 # can go up
+def nextValidStates(map,map_height,map_width,closed_list,state):
+    nextStates = []
+    up = False
+    down = False
+    left = False
+    right = False
+    x = state[0]
+    y = state[1]
+    cost = state[2] + 1
 
-    if position[0] + 1 < map_height:
-        if map[position[0]+1][position[1]] == '.':
-            actions['s'] = 1 # can go down
+    if x - 1 >= 0 and not isAlreadyVisited(closed_list,state):
+        if map[x - 1][y] == 0:
+            nextStates.append([x - 1,y,cost])
+            up = True
 
-    if position[1] + 1 < map_width:
-        if map[position[0]][position[1]+1] == '.':
-            actions['d'] = 1 # can go right
-    
-    if position[0] - 1 >= 0:
-        if map[position[0]][position[1]-1] == '.':
-            actions['a'] = 1 # can go left
+    if y + 1 < map_height and not isAlreadyVisited(closed_list,state):
+        if map[x + 1][y] == 0:
+            nextStates.append([x + 1,y,cost])
+            down = True
 
-    if actions.has_key('w') & actions.has_key('d'):
-        actions['e'] = 1 # can go upper right diagonal
-    
-    if actions.has_key('w') & actions.has_key('a'):
-        actions['q'] = 1 # can go upper left diagonal
-    
-    if actions.has_key('s') & actions.has_key('d'):
-        actions['x'] = 1 # can go lower right diagonal
-    
-    if actions.has_key('w') & actions.has_key('d'):
-        actions['z'] = 1 # can go lower left diagonal
+    if y - 1 >= 0 and not isAlreadyVisited(closed_list,state):
+        if map[x][y-1] == 0:
+            nextStates.append([x,y - 1,cost])
+            left = True
 
-    return actions
+    if y + 1 < map_width and not isAlreadyVisited(closed_list,state):
+        if map[x][y+1] == 0:
+            nextStates.append([x,y + 1,cost])
+            right = True
+
+    if up and right and map[x - 1][y + 1] == 0:
+        nextStates.append([x - 1,y + 1,cost])
+
+    if up and left and map[x - 1][y - 1] == 0:
+        nextStates.append([x - 1,y - 1,cost])
+
+    if down and right and map[x + 1][y + 1] == 0:
+        nextStates.append([x + 1,y + 1,cost])
+
+    if down and left and map[x + 1][y - 1] == 0:
+        nextStates.append([x + 1,y - 1,cost])
+
+    return nextStates

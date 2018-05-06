@@ -3,4 +3,4 @@
 #echo "Posicao Final: ($4,$5)"
 #echo "Heuristica em A-estrela: $6"
 
-python main.py ids $1 $2 $3 $4 $5 -1
+python main.py ucs $1 $2 $3 $4 $5 -1

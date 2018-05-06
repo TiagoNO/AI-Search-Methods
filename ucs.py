@@ -114,10 +114,10 @@ def getFather(closed_list,state):
 
 def out_put(path):
     print "<" + str(path[0][1][0]) + "," + str(path[0][1][1]) + "," + str(path[0][0]) + ">"
-    print "<" + str(path[-1][1][0]) + "," + str(path[-1][1][1]) + "," + str(path[-1][0]) + ">"
-    print "\n"
+    print "<" + str(path[-1][1][0]) + "," + str(path[-1][1][1]) + "," + str(path[-1][0]) + ">\n"
     for s in path:
         print "<" + str(s[1][0]) + "," + str(s[1][1]) + "," + str(s[0]) + ">",
+    print "\n"
 
 def imprime_caminho(map,closed_list,state):
     path = []

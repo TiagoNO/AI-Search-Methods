@@ -1,6 +1,7 @@
 from heapq import *
 
 def is_goal(state,goal):
+    #print state,goal
     if state[1][0] == goal[0] and state[1][1] == goal[1]:
         return True
     else:
@@ -22,23 +23,24 @@ def getPossibleMoves(map,map_height,map_width,heap,heap_map,heuristic_map,state)
 
     x = state[1][0]
     cost = state[3] + 1.0
+    
     y = state[1][1]
     father = (x,y)
     if x - 1 >= 0:
         if map[x-1][y] != 1 and validInClosedList(heap_map,(x-1,y)):
-            heu_value = heuristic_map[(x-1,y)]
-            nextStates.append([heu_value,(x-1,y),father,cost])
+            heu_value = heuristic_map[(x-1,y)] + cost
+            nextStates.append([cost + heu_value,(x-1,y),father,cost])
             up = True
 
     if x + 1 < map_height:
         if map[x+1][y] != 1 and validInClosedList(heap_map,(x+1,y)):
-            heu_value = heuristic_map[(x+1,y)]
-            nextStates.append([heu_value,(x+1,y),father,cost])
+            heu_value = heuristic_map[(x+1,y)] + cost
+            nextStates.append([cost + heu_value,(x+1,y),father,cost])
             down = True
 
     if y - 1 >= 0:
         if map[x][y-1] != 1 and validInClosedList(heap_map,(x,y-1)):
-            heu_value = heuristic_map[(x,y-1)]
+            heu_value = heuristic_map[(x,y-1)] + cost
             nextStates.append([heu_value,(x,y-1),father,cost])
             left = True
 
@@ -50,22 +52,22 @@ def getPossibleMoves(map,map_height,map_width,heap,heap_map,heuristic_map,state)
 
     if up and left:
         if map[x-1][y-1] != 1 and validInClosedList(heap_map,(x-1,y-1)):
-            heu_value = heuristic_map[(x-1,y-1)]
+            heu_value = heuristic_map[(x-1,y-1)] + cost + 0.5
             nextStates.append([heu_value,(x-1,y-1),father,cost+0.5])
 
     if up and right:
        if map[x-1][y+1] != 1 and validInClosedList(heap_map,(x-1,y+1)):
-            heu_value = heuristic_map[(x-1,y+1)]
+            heu_value = heuristic_map[(x-1,y+1)] + cost + 0.5 
             nextStates.append([heu_value,(x-1,y+1),father,cost+0.5])
 
     if down and left:
        if map[x+1][y-1] != 1 and validInClosedList(heap_map,(x+1,y-1)):
-            heu_value = heuristic_map[(x+1,y-1)]
+            heu_value = heuristic_map[(x+1,y-1)] + cost + 0.5 
             nextStates.append([heu_value,(x+1,y-1),father,cost+0.5])
 
     if down and right:
        if map[x+1][y+1] != 1 and validInClosedList(heap_map,(x+1,y+1)):
-            heu_value = heuristic_map[(x+1,y+1)]
+            heu_value = heuristic_map[(x+1,y+1)] + cost + 0.5 
             nextStates.append([heu_value,(x+1,y+1),father,cost+0.5])
 
     return nextStates
@@ -75,13 +77,33 @@ def manhatam_dist(state,goal):
     dy = abs(state[1] - goal[1])
     return dx + dy
 
-def bfs_calculate_heuristic(map,map_height,map_width,heuristic_map,goal_state):
+def max(a,b):
+    if a >= b:
+        return a
+    else:
+        return b
+
+def min(a,b):
+    if a <= b:
+        return a
+    else:
+        return b
+
+def octile_dist(state,goal):
+    dx = abs(state[0] - goal[0])
+    dy = abs(state[1] - goal[1])
+    return max(dx,dy) + 0.5*min(dx,dy)
+
+def astar_calculate_heuristic(map,map_height,map_width,heuristic_map,heuristic_type,goal_state):
     for i in xrange(map_height):
         for j in xrange(map_width):
             if map[i][j] == 0:
-                heuristic_map[(i,j)] = manhatam_dist((i,j),goal_state)
-
-def bfs_write_arq(dir,map):
+                if heuristic_type == 0:
+                    heuristic_map[(i,j)] = manhatam_dist((i,j),goal_state)
+                else:
+                    heuristic_map[(i,j)] = octile_dist((i,j),goal_state)
+        
+def astar_write_arq(dir,map):
     arq = open(dir,"w")
     
     for line in map:
@@ -100,11 +122,11 @@ def add_in_heap(heap,heap_map,state):
         heappush(heap,state)
         heap_map[state[1]] = state
 
-def bfs_search(map,map_height,map_width,heap,heap_map,heuristic_map,goal):
+def astar_search(map,map_height,map_width,heap,heap_map,heuristic_map,goal):
     while heap:
         state = heappop(heap)
         add_closed_list(heap_map,state)
-        #print state
+        #map[state[1][0]][state[1][1]] = 3
 
         if is_goal(state,goal):
             imprime_caminho(map,heap_map,state)
@@ -116,7 +138,7 @@ def bfs_search(map,map_height,map_width,heap,heap_map,heuristic_map,goal):
                 add_in_heap(heap,heap_map,s)
     return False
 
-def bfs_no_solution(state,goal):
+def astar_no_solution(state,goal):
     print "<" + str(state[0]) + "," + str(state[1]) + ",0>"
     print "<" + str(goal[0]) + "," + str(goal[1]) + ",inf>" 
 

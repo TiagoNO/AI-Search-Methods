@@ -29,13 +29,13 @@ def getPossibleMoves(map,map_height,map_width,heap,heap_map,heuristic_map,state)
     if x - 1 >= 0:
         if map[x-1][y] != 1 and validInClosedList(heap_map,(x-1,y)):
             heu_value = heuristic_map[(x-1,y)] + cost
-            nextStates.append([cost + heu_value,(x-1,y),father,cost])
+            nextStates.append([heu_value,(x-1,y),father,cost])
             up = True
 
     if x + 1 < map_height:
         if map[x+1][y] != 1 and validInClosedList(heap_map,(x+1,y)):
             heu_value = heuristic_map[(x+1,y)] + cost
-            nextStates.append([cost + heu_value,(x+1,y),father,cost])
+            nextStates.append([heu_value,(x+1,y),father,cost])
             down = True
 
     if y - 1 >= 0:
@@ -46,7 +46,7 @@ def getPossibleMoves(map,map_height,map_width,heap,heap_map,heuristic_map,state)
 
     if y + 1 < map_width:
         if map[x][y+1] != 1 and validInClosedList(heap_map,(x,y+1)):
-            heu_value = heuristic_map[(x,y+1)]
+            heu_value = heuristic_map[(x,y+1)] + cost
             nextStates.append([heu_value,(x,y+1),father,cost])
             right = True
 
@@ -67,7 +67,7 @@ def getPossibleMoves(map,map_height,map_width,heap,heap_map,heuristic_map,state)
 
     if down and right:
        if map[x+1][y+1] != 1 and validInClosedList(heap_map,(x+1,y+1)):
-            heu_value = heuristic_map[(x+1,y+1)] + cost + 0.5 
+            heu_value = heuristic_map[(x+1,y+1)] + cost + 0.5
             nextStates.append([heu_value,(x+1,y+1),father,cost+0.5])
 
     return nextStates
@@ -123,11 +123,13 @@ def add_in_heap(heap,heap_map,state):
         heap_map[state[1]] = state
 
 def astar_search(map,map_height,map_width,heap,heap_map,heuristic_map,goal):
-    while heap:
+    while len(heap) != 0:
+        print "heap:",heap
         state = heappop(heap)
         add_closed_list(heap_map,state)
-        #map[state[1][0]][state[1][1]] = 3
-
+        map[state[1][0]][state[1][1]] = 3
+        if state[1][0] == 158 and state[1][1] == 166:
+            print heap
         if is_goal(state,goal):
             imprime_caminho(map,heap_map,state)
             return True
@@ -168,5 +170,6 @@ def imprime_caminho(map,closed_list,state):
         p_state = getFather(closed_list,p_state)
         map[p_state[1][0]][p_state[1][1]] = 3
         path.insert(0,[p_state[0],p_state[1],p_state[2],p_state[3]])
+        #print p_state
     out_put(path)
     return path

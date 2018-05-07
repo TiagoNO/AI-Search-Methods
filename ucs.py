@@ -63,7 +63,7 @@ def getPossibleMoves(map,map_height,map_width,heap,heap_map,state):
 
     return nextStates
 
-def write_arq(dir,map):
+def ucs_write_arq(dir,map):
     arq = open(dir,"w")
     
     for line in map:
@@ -98,7 +98,7 @@ def ucs_search(map,map_height,map_width,heap,heap_map,goal):
                 add_in_heap(heap,heap_map,s)
     return False
 
-def ids_no_solution(state,goal):
+def ucs_no_solution(state,goal):
     print "<" + str(state[1][0]) + "," + str(state[1][1]) + ",0>"
     print "<" + str(goal[0]) + "," + str(goal[1]) + ",inf>" 
 

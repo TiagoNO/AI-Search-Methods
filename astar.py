@@ -13,7 +13,7 @@ def validInClosedList(closed_list,state):
         return True
 
 
-def getPossibleMoves(map,map_height,map_width,heap,heap_map,heuristic_map,state):
+def getPossibleMoves(map,map_height,map_width,heap,heap_map,heuristic_type,state,goal):
     nextStates = []
     up = False
     down = False
@@ -24,61 +24,74 @@ def getPossibleMoves(map,map_height,map_width,heap,heap_map,heuristic_map,state)
     cost = state[3] + 1.0
     y = state[1][1]
     father = (x,y)
-    
+    k = 4
+
     if x - 1 >= 0:
         if map[x-1][y] != '@' and validInClosedList(heap_map,(x-1,y)):
-            heu_value = heuristic_map[(x-1,y)] + cost*3
+            heu_value = calculate_heuristic(heuristic_type,(x-1,y),goal)
+            heu_value += cost*k
             nextStates.append([heu_value,(x-1,y),father,cost])
             up = True
 
     if x + 1 < map_height:
         if map[x+1][y] != '@' and validInClosedList(heap_map,(x+1,y)):
-            heu_value = heuristic_map[(x+1,y)] + cost*3
+            heu_value = calculate_heuristic(heuristic_type,(x+1,y),goal)
+            heu_value += cost*k
             nextStates.append([heu_value,(x+1,y),father,cost])
             down = True
 
     if y - 1 >= 0:
         if map[x][y-1] != '@' and validInClosedList(heap_map,(x,y-1)):
-            heu_value = heuristic_map[(x,y-1)] + cost*3
+            heu_value = calculate_heuristic(heuristic_type,(x,y-1),goal)
+            heu_value += cost*k
             nextStates.append([heu_value,(x,y-1),father,cost])
             left = True
 
     if y + 1 < map_width:
         if map[x][y+1] != '@' and validInClosedList(heap_map,(x,y+1)):
-            heu_value = heuristic_map[(x,y+1)] + cost*3
+            heu_value = calculate_heuristic(heuristic_type,(x,y+1),goal)
+            heu_value += cost*k
             nextStates.append([heu_value,(x,y+1),father,cost])
             right = True
 
     if up and left:
         if map[x-1][y-1] != '@' and validInClosedList(heap_map,(x-1,y-1)):
-            heu_value = heuristic_map[(x-1,y-1)] + (cost + 0.5)*3
-            nextStates.append([heu_value,(x-1,y-1),father,cost+0.5])
+            cost += 0.5
+            heu_value = calculate_heuristic(heuristic_type,(x-1,y-1),goal)
+            heu_value += cost*k
+            nextStates.append([heu_value,(x-1,y-1),father,cost])
 
     if up and right:
        if map[x-1][y+1] != '@' and validInClosedList(heap_map,(x-1,y+1)):
-            heu_value = heuristic_map[(x-1,y+1)] + (cost + 0.5)*3
-            nextStates.append([heu_value,(x-1,y+1),father,cost+0.5])
+            cost += 0.5
+            heu_value = calculate_heuristic(heuristic_type,(x-1,y+1),goal)
+            heu_value += cost*k
+            nextStates.append([heu_value,(x-1,y+1),father,cost])
 
     if down and left:
        if map[x+1][y-1] != '@' and validInClosedList(heap_map,(x+1,y-1)):
-            heu_value = heuristic_map[(x+1,y-1)] + (cost + 0.5)*3
-            nextStates.append([heu_value,(x+1,y-1),father,cost+0.5])
+            cost += 0.5
+            heu_value = calculate_heuristic(heuristic_type,(x+1,y-1),goal)
+            heu_value += cost*k
+            nextStates.append([heu_value,(x+1,y-1),father,cost])
 
     if down and right:
        if map[x+1][y+1] != '@' and validInClosedList(heap_map,(x+1,y+1)):
-            heu_value = heuristic_map[(x+1,y+1)] + (cost + 0.5)*3
-            nextStates.append([heu_value,(x+1,y+1),father,cost+0.5])
+            cost += 0.5
+            heu_value = calculate_heuristic(heuristic_type,(x+1,y+1),goal)
+            heu_value += cost*k
+            nextStates.append([heu_value,(x+1,y+1),father,cost])
 
     return nextStates
 
 def max(a,b):
-    if a > b:
+    if a >= b:
         return a
     else:
         return b
 
 def min(a,b):
-    if a < b:
+    if a <= b:
         return a
     else:
         return b
@@ -95,15 +108,11 @@ def octile_dist(state,goal):
     fn = max(dx,dy) + 0.5*min(dx,dy)
     return fn
 
-def astar_calculate_heuristic(map,map_height,map_width,heuristic_map,goal,heuristic_type):
-    for i in xrange(map_height):
-        for j in xrange(map_width):
-            if map[i][j] == '.':
-                if heuristic_type == 0:
-                    heuristic_map[(i,j)] = manhatam_dist((i,j),goal)
-                elif heuristic_type == 1:
-                    heuristic_map[(i,j)] = octile_dist((i,j),goal)
-                    #print octile_dist((i,j),goal),"(",i,j,")"
+def calculate_heuristic(heuristic_type,state,goal):
+    if heuristic_type == 0:
+        return manhatam_dist(state,goal)
+    elif heuristic_type == 1:
+        return octile_dist(state,goal)
 
 def astar_write_arq(dir,map):
     arq = open(dir,"w")
@@ -129,18 +138,17 @@ def pause_execution():
     a = raw_input("pressione enter para continuar...")
 
 
-def astar_search(map,map_height,map_width,heap,heap_map,heuristic_map,goal):
+def astar_search(map,map_height,map_width,heap,heap_map,heuristic_type,goal):
     while heap:
         state = heappop(heap)
         add_closed_list(heap_map,state)
 
         if is_goal(state,goal):
-#            print state[-1],state[1]
             imprime_caminho(map,heap_map,state)
             return True
 
         else:
-            nextValidStates = getPossibleMoves(map,map_height,map_width,heap,heap_map,heuristic_map,state)
+            nextValidStates = getPossibleMoves(map,map_height,map_width,heap,heap_map,heuristic_type,state,goal)
             for s in nextValidStates:
                 add_in_heap(heap,heap_map,s)
     return False

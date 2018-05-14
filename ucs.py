@@ -132,5 +132,5 @@ def imprime_caminho(map,closed_list,state):
         path.insert(0,[p_state[0],p_state[1],p_state[2]])
         i += 1
     out_put(path)
-    print i
+    #print i
     return path

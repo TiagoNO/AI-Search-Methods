@@ -139,24 +139,20 @@ def ids_search(map,map_height,map_width,open_list,map_list,closed_list,goal,lim)
         add_closed_list(closed_list,state)
 
         if is_goal(state,goal):
-            #imprime_caminho(map,closed_list,state)
             paths.append(state)
 
-#        if lim > 20:
-#            pause_execution()
-
+        nextValidStates = getPossibleMoves(map,map_height,map_width,open_list,map_list,closed_list,state)
         if not reached_lim(state,lim):
-            nextValidStates = getPossibleMoves(map,map_height,map_width,open_list,map_list,closed_list,state)
             for s in nextValidStates:
                 if is_valid(open_list,map_list,closed_list,s):
                     add_open_list(open_list,map_list,s)
+
     if len(paths) == 0:
         return False
     else:
         minP = choose_min_path(paths)    
-        #print minP[0],minP[2]
         imprime_caminho(map,closed_list,minP)
-        return True
+        return True    
 
 def ids_no_solution(state,goal):
     print "<" + str(state[0]) + "," + str(state[1]) + ",0>"
@@ -192,4 +188,4 @@ def imprime_caminho(map,closed_list,state):
         i += 1
     #write_arq("ids_Final_log",map)
     out_put(path)  
-    print i
+    #print i

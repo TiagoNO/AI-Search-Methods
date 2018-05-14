@@ -9,8 +9,8 @@ class inputManager:
         self.map_type = str()
         self.map_height = int()
         self.map_width = int()
-        self.initial_state = [int(argv[3]),int(argv[4])]
-        self.goal_state = [int(argv[5]),int(argv[6])]
+        self.initial_state = (int(argv[3]),int(argv[4]))
+        self.goal_state = (int(argv[5]),int(argv[6]))
         self.aStar = int(argv[7])
         self.get_map()
 
@@ -33,4 +33,5 @@ class inputManager:
                 elif char == '@':
                     map_line.append('@')
             self.map.append(map_line)
-        
+
+        arq.close()        

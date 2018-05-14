@@ -26,39 +26,39 @@ def getPossibleMoves(map,map_height,map_width,heap,heap_map,state):
     father = (x,y)
 
     if x - 1 >= 0:
-        if map[x-1][y] != 1 and validInClosedList(heap_map,(x-1,y)):
+        if map[x-1][y] != '@' and validInClosedList(heap_map,(x-1,y)):
             nextStates.append([cost,(x-1,y),father])
             up = True
 
     if x + 1 < map_height:
-        if map[x+1][y] != 1 and validInClosedList(heap_map,(x+1,y)):
+        if map[x+1][y] != '@' and validInClosedList(heap_map,(x+1,y)):
             nextStates.append([cost,(x+1,y),father])
             down = True
 
     if y - 1 >= 0:
-        if map[x][y-1] != 1 and validInClosedList(heap_map,(x,y-1)):
+        if map[x][y-1] != '@' and validInClosedList(heap_map,(x,y-1)):
             nextStates.append([cost,(x,y-1),father])
             left = True
 
     if y + 1 < map_width:
-        if map[x][y+1] != 1 and validInClosedList(heap_map,(x,y+1)):
+        if map[x][y+1] != '@' and validInClosedList(heap_map,(x,y+1)):
             nextStates.append([cost,(x,y+1),father])
             right = True
 
     if up and left:
-        if map[x-1][y-1] != 1 and validInClosedList(heap_map,(x-1,y-1)):
+        if map[x-1][y-1] != '@' and validInClosedList(heap_map,(x-1,y-1)):
             nextStates.append([cost+0.5,(x-1,y-1),father])
 
     if up and right:
-       if map[x-1][y+1] != 1 and validInClosedList(heap_map,(x-1,y+1)):
+       if map[x-1][y+1] != '@' and validInClosedList(heap_map,(x-1,y+1)):
             nextStates.append([cost+0.5,(x-1,y+1),father])
 
     if down and left:
-       if map[x+1][y-1] != 1 and validInClosedList(heap_map,(x+1,y-1)):
+       if map[x+1][y-1] != '@' and validInClosedList(heap_map,(x+1,y-1)):
             nextStates.append([cost+0.5,(x+1,y-1),father])
 
     if down and right:
-       if map[x+1][y+1] != 1 and validInClosedList(heap_map,(x+1,y+1)):
+       if map[x+1][y+1] != '@' and validInClosedList(heap_map,(x+1,y+1)):
             nextStates.append([cost+0.5,(x+1,y+1),father])
 
     return nextStates
@@ -85,10 +85,11 @@ def add_in_heap(heap,heap_map,state):
 def ucs_search(map,map_height,map_width,heap,heap_map,goal):
     while heap:
         state = heappop(heap)
-        #map[state[1][0]][state[1][1]] = 3
+        #map[state[1][0]][state[1][1]] = 'x'
         add_closed_list(heap_map,state)
 
         if is_goal(state,goal):
+#            print state[0],state[1]
             imprime_caminho(map,heap_map,state)
             return True
 
@@ -121,12 +122,15 @@ def out_put(path):
 
 def imprime_caminho(map,closed_list,state):
     path = []
+    i = 1
     p_state = state
-    map[state[1][0]][state[1][1]] = 3
+    map[state[1][0]][state[1][1]] = 'x'
     path.insert(0,[p_state[0],p_state[1],p_state[2]])
     while not isRoot(p_state):
         p_state = getFather(closed_list,p_state)
-        map[p_state[1][0]][p_state[1][1]] = 3
+        map[p_state[1][0]][p_state[1][1]] = 'x'
         path.insert(0,[p_state[0],p_state[1],p_state[2]])
+        i += 1
     out_put(path)
+    print i
     return path

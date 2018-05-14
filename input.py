@@ -29,8 +29,8 @@ class inputManager:
             map_line = []
             for char in line:
                 if char == '.':
-                    map_line.append(0)
-                else:
-                    map_line.append(1)
+                    map_line.append('.')
+                elif char == '@':
+                    map_line.append('@')
             self.map.append(map_line)
         

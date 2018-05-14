@@ -1,7 +1,6 @@
 from heapq import *
 
 def is_goal(state,goal):
-    #print state,goal
     if state[1][0] == goal[0] and state[1][1] == goal[1]:
         return True
     else:
@@ -23,86 +22,89 @@ def getPossibleMoves(map,map_height,map_width,heap,heap_map,heuristic_map,state)
 
     x = state[1][0]
     cost = state[3] + 1.0
-    
     y = state[1][1]
     father = (x,y)
+    
     if x - 1 >= 0:
-        if map[x-1][y] != 1 and validInClosedList(heap_map,(x-1,y)):
-            heu_value = heuristic_map[(x-1,y)] + cost
+        if map[x-1][y] != '@' and validInClosedList(heap_map,(x-1,y)):
+            heu_value = heuristic_map[(x-1,y)] + cost*3
             nextStates.append([heu_value,(x-1,y),father,cost])
             up = True
 
     if x + 1 < map_height:
-        if map[x+1][y] != 1 and validInClosedList(heap_map,(x+1,y)):
-            heu_value = heuristic_map[(x+1,y)] + cost
+        if map[x+1][y] != '@' and validInClosedList(heap_map,(x+1,y)):
+            heu_value = heuristic_map[(x+1,y)] + cost*3
             nextStates.append([heu_value,(x+1,y),father,cost])
             down = True
 
     if y - 1 >= 0:
-        if map[x][y-1] != 1 and validInClosedList(heap_map,(x,y-1)):
-            heu_value = heuristic_map[(x,y-1)] + cost
+        if map[x][y-1] != '@' and validInClosedList(heap_map,(x,y-1)):
+            heu_value = heuristic_map[(x,y-1)] + cost*3
             nextStates.append([heu_value,(x,y-1),father,cost])
             left = True
 
     if y + 1 < map_width:
-        if map[x][y+1] != 1 and validInClosedList(heap_map,(x,y+1)):
-            heu_value = heuristic_map[(x,y+1)] + cost
+        if map[x][y+1] != '@' and validInClosedList(heap_map,(x,y+1)):
+            heu_value = heuristic_map[(x,y+1)] + cost*3
             nextStates.append([heu_value,(x,y+1),father,cost])
             right = True
 
     if up and left:
-        if map[x-1][y-1] != 1 and validInClosedList(heap_map,(x-1,y-1)):
-            heu_value = heuristic_map[(x-1,y-1)] + cost + 0.5
+        if map[x-1][y-1] != '@' and validInClosedList(heap_map,(x-1,y-1)):
+            heu_value = heuristic_map[(x-1,y-1)] + (cost + 0.5)*3
             nextStates.append([heu_value,(x-1,y-1),father,cost+0.5])
 
     if up and right:
-       if map[x-1][y+1] != 1 and validInClosedList(heap_map,(x-1,y+1)):
-            heu_value = heuristic_map[(x-1,y+1)] + cost + 0.5 
+       if map[x-1][y+1] != '@' and validInClosedList(heap_map,(x-1,y+1)):
+            heu_value = heuristic_map[(x-1,y+1)] + (cost + 0.5)*3
             nextStates.append([heu_value,(x-1,y+1),father,cost+0.5])
 
     if down and left:
-       if map[x+1][y-1] != 1 and validInClosedList(heap_map,(x+1,y-1)):
-            heu_value = heuristic_map[(x+1,y-1)] + cost + 0.5 
+       if map[x+1][y-1] != '@' and validInClosedList(heap_map,(x+1,y-1)):
+            heu_value = heuristic_map[(x+1,y-1)] + (cost + 0.5)*3
             nextStates.append([heu_value,(x+1,y-1),father,cost+0.5])
 
     if down and right:
-       if map[x+1][y+1] != 1 and validInClosedList(heap_map,(x+1,y+1)):
-            heu_value = heuristic_map[(x+1,y+1)] + cost + 0.5
+       if map[x+1][y+1] != '@' and validInClosedList(heap_map,(x+1,y+1)):
+            heu_value = heuristic_map[(x+1,y+1)] + (cost + 0.5)*3
             nextStates.append([heu_value,(x+1,y+1),father,cost+0.5])
 
     return nextStates
 
-def manhatam_dist(state,goal):
-    dx = abs(state[0] - goal[0])
-    dy = abs(state[1] - goal[1])
-    return dx + dy
-
 def max(a,b):
-    if a >= b:
+    if a > b:
         return a
     else:
         return b
 
 def min(a,b):
-    if a <= b:
+    if a < b:
         return a
     else:
         return b
 
+def manhatam_dist(state,goal):
+    dx = abs(state[0] - goal[0])
+    dy = abs(state[1] - goal[1])
+    fn = dx + dy
+    return fn
+
 def octile_dist(state,goal):
     dx = abs(state[0] - goal[0])
     dy = abs(state[1] - goal[1])
-    return max(dx,dy) + 0.5*min(dx,dy)
+    fn = max(dx,dy) + 0.5*min(dx,dy)
+    return fn
 
-def astar_calculate_heuristic(map,map_height,map_width,heuristic_map,heuristic_type,goal_state):
+def astar_calculate_heuristic(map,map_height,map_width,heuristic_map,goal,heuristic_type):
     for i in xrange(map_height):
         for j in xrange(map_width):
-            if map[i][j] == 0:
+            if map[i][j] == '.':
                 if heuristic_type == 0:
-                    heuristic_map[(i,j)] = manhatam_dist((i,j),goal_state)
-                else:
-                    heuristic_map[(i,j)] = octile_dist((i,j),goal_state)
-        
+                    heuristic_map[(i,j)] = manhatam_dist((i,j),goal)
+                elif heuristic_type == 1:
+                    heuristic_map[(i,j)] = octile_dist((i,j),goal)
+                    #print octile_dist((i,j),goal),"(",i,j,")"
+
 def astar_write_arq(dir,map):
     arq = open(dir,"w")
     
@@ -117,20 +119,23 @@ def add_closed_list(closed_list,state):
 def add_in_heap(heap,heap_map,state):
     if heap_map.has_key(state[1]):
         if heap_map[state[1]][0] > state[0]:
-            heapreplace(heap,state)
+            heap[heap.index(state)] = state
+            heapify(heap)
     else:
         heappush(heap,state)
         heap_map[state[1]] = state
 
+def pause_execution():
+    a = raw_input("pressione enter para continuar...")
+
+
 def astar_search(map,map_height,map_width,heap,heap_map,heuristic_map,goal):
-    while len(heap) != 0:
-        print "heap:",heap
+    while heap:
         state = heappop(heap)
         add_closed_list(heap_map,state)
-        map[state[1][0]][state[1][1]] = 3
-        if state[1][0] == 158 and state[1][1] == 166:
-            print heap
+
         if is_goal(state,goal):
+#            print state[-1],state[1]
             imprime_caminho(map,heap_map,state)
             return True
 
@@ -164,12 +169,11 @@ def out_put(path):
 def imprime_caminho(map,closed_list,state):
     path = []
     p_state = state
-    map[state[1][0]][state[1][1]] = 3
+    map[state[1][0]][state[1][1]] = 'x'
     path.insert(0,[p_state[0],p_state[1],p_state[2],p_state[3]])
     while not isRoot(p_state):
         p_state = getFather(closed_list,p_state)
-        map[p_state[1][0]][p_state[1][1]] = 3
+        map[p_state[1][0]][p_state[1][1]] = 'x'
         path.insert(0,[p_state[0],p_state[1],p_state[2],p_state[3]])
-        #print p_state
     out_put(path)
     return path

@@ -1,2 +1,2 @@
 <h1 align="center">AI-Search-Methods</h1>
-<p align="center"></p>
+<p align="center">	Esse projeto teve como objetivo implementar quatro metodos de busca em espaço de estados. Dado um mapa, o agente deve encontrar o menor caminho entre o ponto inicial e um objetivo. Esses mapas são bidimensionais e representados por matrizes, e pode ser visto como um tilemap. Um jogo baseado em tilemap é àquele que consiste de pequenos blocos que formam o mapa. Cada um desses blocos, pode ter propriedades diferentes. Para a aplicação, existem apenas dois tipos: O tile de terreno, em que o agente pode andar, e o de parede, que é intransponível. </p>

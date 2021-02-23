@@ -16,4 +16,5 @@ Tabela de conteúdos
    * [Referências](#tecnologias)
 <!--te-->
 
-<h1 align="" id="mapa"> Mapa </h1>
+#Mapa
+<p align="left"> Os mapas utilizados são bidimensionais e representados por matrizes, e pode ser visto como um tilemap. Um jogo baseado em tilemap é àquele que consiste de pequenos blocos que formam o mapa. Cada um desses blocos, pode ter propriedades diferentes. Para a aplicação, existem apenas dois tipos: O tile de terreno, em que o agente pode andar, e o de parede, que é intransponível. </p>

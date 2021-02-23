@@ -17,5 +17,5 @@ Tabela de conteúdos
 <!--te-->
 
 
-Mapa(#mapa)
+Mapa [Mapa]
 =================

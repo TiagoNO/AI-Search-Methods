@@ -1,5 +1,6 @@
  
 import pygame
+import math
 
 # colors in rendering
 GOAL_COLOR = (233, 196, 106)
@@ -12,6 +13,8 @@ CLOSED_LIST_COLOR = (244, 162, 97)
 MARGIN_COLOR = (24, 24, 26)
 PATH_COLOR = (110, 141, 100)
 
+Error_color = (0, 0, 0)
+
 # type in tilemap
 GOAL = 0
 OPEN_LIST = 1
@@ -19,57 +22,98 @@ CLOSED_LIST = 2
 OBSTACLES = 3
 NOT_VISITED = 4
 PATH = 5
+ERROR = 6
 
 class GUI:
 
-    def __init__(self, screen_size, initial_position, goal_position):
+    def __init__(self, screen_size, start, goal, game_map, ratio=1):
         pygame.init()
 
         # Set the width and height of the screen [width, height]
         self.screen_size = screen_size
         self.display = pygame.display.set_mode(self.screen_size)
+        self.ratio = min(ratio, 1)
+        self.ratio = max(self.ratio, 0)
 
-        self.block_size = 20
-        self.margin = 5
+        self.setElementSizes(game_map)
 
         #pygame.display.set_caption("My Game")
-        pygame.display.set_caption("My Game")
+        pygame.display.set_caption("Search Method")
  
         # Loop until the user clicks the close button.
         self.done = False
  
+        # initialize tile map
+        self.goal = goal
+
+        print(start)
+        self.position = [0, 0]
+        self.position[0] = start[0] - int(self.tile_map_size[0]/2)
+        self.position[1] = start[1] - int(self.tile_map_size[1]/2)
+        print(self.position)
+
+
         # Used to manage how fast the screen updates
         self.clock = pygame.time.Clock()
-        self.initializeTileMap(initial_position)
 
+        # controllers
         self.left = False
         self.right = False
         self.up = False
         self.down = False
+        self.zoom_in = False
+        self.zoom_out = False
 
-        self.goal = goal_position
+    def zoomIn(self):
+        self.ratio = max(0.12, self.ratio-0.22)
 
-    def initializeTileMap(self, initial_position):
+    def zoomOut(self):
+        self.ratio = min(1, self.ratio+0.22)
+
+    def setElementSizes(self, game_map):
+        self.margin = 1
+
+        # the frame of the original map that we will show!
+        self.tile_map_size = [0, 0]
+        self.tile_map_size[0] = int(self.ratio * game_map.width) 
+        self.tile_map_size[1] = int(self.ratio * game_map.height)
+
+        self.w_block_sz = int(self.screen_size[0] / (self.tile_map_size[0])) - self.margin
+        self.h_block_sz = int(self.screen_size[1] / (self.tile_map_size[1])) - self.margin
+
+        self.w_number_blocks = int(self.screen_size[0] / (self.w_block_sz + self.margin))
+        self.h_number_blocks = int(self.screen_size[1] / (self.h_block_sz + self.margin))
+
+        print(self.w_block_sz, self.h_block_sz)
+        print(self.w_number_blocks, self.h_number_blocks)
+        print(self.tile_map_size, self.ratio)
+        self.initializeTileMap(game_map)
+
+    def initializeTileMap(self, game_map):
         self.tile_map = []
-        total_block_size = (self.block_size + self.margin)
-        n_width_cubes = int(self.screen_size[0]/total_block_size)
-        n_height_cubes = int(self.screen_size[1]/total_block_size)
-
-        for j in range(0, n_height_cubes):
+        for j in range(0, game_map.width):
             line = []
-            for i in range(0, n_width_cubes):
+            for i in range(0, game_map.height):
                 line.append(0)
             self.tile_map.append(line)
-            self.position = initial_position
+
         #print(self.position)
 
+    def inFrame(self, x, y):
+        #print(x, y, self.tile_map_size)
+        if(x >= self.h_number_blocks or x < 0):
+            return False
+        
+        if(y >= self.w_number_blocks or y < 0):
+            return False
+        
+        return True
+
     def setMap(self, game_map):
-        for j in range(len(self.tile_map)):
-            for i in range(len(self.tile_map[j])):
+        for j in range(self.tile_map_size[0]):
+            for i in range(self.tile_map_size[1]):
                 x = self.position[0] + i
                 y = self.position[1] + j
-
-                #print("Position: ",self.position, "Index: ", (i, j))
 
                 if(game_map.getTile((y, x)) == '@'):
                     self.tile_map[j][i] = OBSTACLES
@@ -81,29 +125,8 @@ class GUI:
         y = self.goal[1] - self.position[0]
 
         if(self.inFrame(x, y)):
+            #print(x, y, self.tile_map_size)
             self.tile_map[x][y] = GOAL
-
-    def movePositionRight(self, game_map):
-        total_block_size = (self.block_size + self.margin)
-        n_width_cubes = int(self.screen_size[1]/total_block_size)
-
-        self.position[1] = int(self.position[1] + n_width_cubes/2)
-        if(self.position[1] + n_width_cubes > game_map.width):
-            self.position[1] -= (self.position[1] + n_width_cubes - game_map.width)
-
-    def inFrame(self, x, y):
-        total_block_size = (self.block_size + self.margin)
-        n_width_cubes = int(self.screen_size[0]/total_block_size)
-        n_height_cubes = int(self.screen_size[1]/total_block_size)
-
-        if(x >= n_height_cubes or x < 0):
-            return False
-        
-        if(y >= n_width_cubes or y < 0):
-            return False
-            
-        #print([x, y], [n_width_cubes, n_height_cubes])
-        return True
 
     def setOpenList(self, open_list, game_map):
         for s in open_list:
@@ -153,20 +176,16 @@ class GUI:
             return PATH_COLOR
 
     def draw(self):
-        total_block_size = (self.block_size + self.margin)
-
-        for j in range(len(self.tile_map)):
-            for i in range(len(self.tile_map[j])):
-                rect = pygame.Rect(i*total_block_size, j*total_block_size, self.block_size, self.block_size)                
+        for j in range(self.tile_map_size[0]):
+            for i in range(self.tile_map_size[1]):
+                rect = pygame.Rect(i*(self.w_block_sz+self.margin), j*(self.h_block_sz+self.margin), self.w_block_sz, self.h_block_sz)
                 pygame.draw.rect(self.display, self.getTileColor(j, i), rect)
     
     def close(self):
         pygame.quit()
 
     def moveFrameDown(self, game_map):
-        total_block_size = (self.block_size + self.margin)
-        n_height_cubes = int(self.screen_size[1]/total_block_size)
-        self.position[1] = min(self.position[1] + 1, game_map.height - n_height_cubes)
+        self.position[1] = min(self.position[1] + 1, game_map.height)
 
     def moveFrameUP(self, game_map):
         self.position[1] = max(0, self.position[1] - 1)
@@ -175,9 +194,14 @@ class GUI:
         self.position[0] = max(0, self.position[0] - 1)
 
     def moveFrameRight(self, game_map):
-        total_block_size = (self.block_size + self.margin)
-        n_width_cubes = int(self.screen_size[0]/total_block_size)
-        self.position[0] = min(self.position[0] + 1, game_map.width - n_width_cubes)
+        self.position[0] = min(self.position[0] + 1, game_map.width)
+
+    def validPosition(self, game_map):        
+        self.position[0] = max(0, self.position[0])
+        self.position[1] = max(0, self.position[1])
+        
+        self.position[0] = min(self.position[0], game_map.width - self.tile_map_size[0])
+        self.position[1] = min(self.position[1], game_map.height - self.tile_map_size[1])
 
     def handleEvents(self):
         for event in pygame.event.get(): #look at all events
@@ -194,6 +218,13 @@ class GUI:
                 if(event.key == pygame.K_RIGHT or event.key == pygame.K_d):
                     self.right = True
 
+                if(event.key == pygame.K_x):
+                    self.zoom_in = True
+
+                if(event.key == pygame.K_z):
+                    self.zoom_out = True
+
+
             if event.type == pygame.KEYUP:
                 if(event.key == pygame.K_DOWN or event.key == pygame.K_s):
                     self.down = False
@@ -206,6 +237,12 @@ class GUI:
 
                 if(event.key == pygame.K_RIGHT or event.key == pygame.K_d):
                     self.right = False
+
+                if(event.key == pygame.K_x):
+                    self.zoom_in = False
+
+                if(event.key == pygame.K_z):
+                    self.zoom_out = False
 
 
             if event.type == pygame.QUIT:
@@ -224,6 +261,16 @@ class GUI:
         if self.right:
             self.moveFrameRight(game_map)
 
+        if self.zoom_in:
+            self.zoomIn()
+            self.setElementSizes(game_map)
+            self.zoom_in = False
+
+        if self.zoom_out:
+            self.zoomOut()
+            self.setElementSizes(game_map)
+            self.zoom_out = False
+
     def exit(self, game_map, open_list, closed_list, best_path):
         while not self.done:
             self.step(game_map, open_list, closed_list, best_path)
@@ -238,6 +285,7 @@ class GUI:
         self.display.fill(MARGIN_COLOR)
     
         # --- Drawing code should go here
+        self.validPosition(game_map)
         self.setMap(game_map)
         self.setOpenList(open_list, game_map)
         self.setClosedList(closed_list)

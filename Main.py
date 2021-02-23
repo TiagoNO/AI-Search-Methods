@@ -16,9 +16,9 @@ BFS_type = "BFS"
 Astar_type = "Astar"
 IDS_type = "IDS"
 
-def initializeGUI():
+def initializeGUI(start, goal, game_map):
     from GUI import GUI
-    return GUI((1920, 1080), list(start.coord), list(goal.coord))
+    return GUI((800, 600), list(start.coord), list(goal.coord), game_map)
 
 def initializeGameMap(map_file):
     return GameMap(map_file)
@@ -56,11 +56,11 @@ args = parseArgs()
 game_map = initializeGameMap(args.map)
 
 start = State((0, 0), 0, 0, None)
-goal = State((26, 15), 0, 0, None)
+goal = State((60, 20), 0, 0, None)
 
 use_gui = args.gui
 if(use_gui):
-    gui = initializeGUI()
+    gui = initializeGUI(start, goal, game_map)
 
 checkState(start, goal)
 method = initializeMethod(args.method)

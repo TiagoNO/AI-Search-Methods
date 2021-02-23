@@ -82,5 +82,8 @@ class GameMap:
                 output_file.write(self.map[x][y])
             output_file.write("\n")
 
+    def size(self):
+        return [self.width, self.height]
+
     def __str__(self):
         return self.map.__str__()

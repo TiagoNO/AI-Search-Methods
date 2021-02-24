@@ -47,7 +47,7 @@ class IDSearch(SearchMethod):
         self.out_of_bounds.clear()
 
     def reachedMaxLim(self, game_map):
-        if(self.limit >= game_map.height * game_map.width):
+        if(self.limit > game_map.height * game_map.width):
             return True
 
     def search(self, game_map):
@@ -104,11 +104,14 @@ class IDSearch(SearchMethod):
                 game_map.write_output_file(self.best_path)
                 self.foundPathMessage(self.best_path)
                 self.found_solution = True
-            self.increaseLimit()
+                return True
 
-        if(self.reachedMaxLim(game_map)):
-            self.noSolutionMessage()
-            self.found_solution = False
+            self.increaseLimit()
+            if(self.reachedMaxLim(game_map)):
+                print(self.limit)
+                self.noSolutionMessage()
+                self.found_solution = False
+                return False
 
     def __str__(self):
-        return "Interactive Depth Search method"
+        return "Iteractive Depth Search method"

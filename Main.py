@@ -56,7 +56,7 @@ args = parseArgs()
 game_map = initializeGameMap(args.map)
 
 start = State((0, 0), 0, 0, None)
-goal = State((60, 20), 0, 0, None)
+goal = State((6, 3), 0, 0, None)
 
 use_gui = args.gui
 if(use_gui):

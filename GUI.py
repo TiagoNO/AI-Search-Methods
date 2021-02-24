@@ -32,9 +32,7 @@ class GUI:
         # Set the width and height of the screen [width, height]
         self.screen_size = screen_size
         self.display = pygame.display.set_mode(self.screen_size)
-        self.ratio = min(ratio, 1)
-        self.ratio = max(self.ratio, 0)
-
+        self.ratio = ratio
         self.setElementSizes(game_map)
 
         #pygame.display.set_caption("My Game")
@@ -45,13 +43,7 @@ class GUI:
  
         # initialize tile map
         self.goal = goal
-
-        print(start)
-        self.position = [0, 0]
-        self.position[0] = start[0] - int(self.tile_map_size[0]/2)
-        self.position[1] = start[1] - int(self.tile_map_size[1]/2)
-        print(self.position)
-
+        self.position = start
 
         # Used to manage how fast the screen updates
         self.clock = pygame.time.Clock()
@@ -75,9 +67,9 @@ class GUI:
 
         # the frame of the original map that we will show!
         self.tile_map_size = [0, 0]
-        self.tile_map_size[0] = int(self.ratio * game_map.width) 
-        self.tile_map_size[1] = int(self.ratio * game_map.height)
-
+        self.tile_map_size[0] = int(max(1, self.ratio * game_map.width))
+        self.tile_map_size[1] = int(max(1, self.ratio * game_map.height))
+ 
         self.w_block_sz = int(self.screen_size[0] / (self.tile_map_size[0])) - self.margin
         self.h_block_sz = int(self.screen_size[1] / (self.tile_map_size[1])) - self.margin
 
@@ -91,16 +83,19 @@ class GUI:
 
     def initializeTileMap(self, game_map):
         self.tile_map = []
-        for j in range(0, game_map.width):
+        for i in range(0, game_map.height):
             line = []
-            for i in range(0, game_map.height):
+            for j in range(0, game_map.width):
                 line.append(0)
             self.tile_map.append(line)
+
+        print(self.tile_map)
+        print("AHHH:", len(self.tile_map), len(self.tile_map[0]))
 
         #print(self.position)
 
     def inFrame(self, x, y):
-        #print(x, y, self.tile_map_size)
+        #print(x, y, self.h_number_blocks, self.w_number_blocks)
         if(x >= self.h_number_blocks or x < 0):
             return False
         
@@ -110,8 +105,8 @@ class GUI:
         return True
 
     def setMap(self, game_map):
-        for j in range(self.tile_map_size[0]):
-            for i in range(self.tile_map_size[1]):
+        for i in range(self.tile_map_size[0]):
+            for j in range(self.tile_map_size[1]):
                 x = self.position[0] + i
                 y = self.position[1] + j
 
@@ -121,12 +116,12 @@ class GUI:
                 elif(game_map.getTile((y, x)) == '.'):
                     self.tile_map[j][i] = NOT_VISITED
 
-        x = self.goal[0] - self.position[1]
-        y = self.goal[1] - self.position[0]
+        #x = self.goal[0] - self.position[1]
+        #y = self.goal[1] - self.position[0]
 
-        if(self.inFrame(x, y)):
+        #if(self.inFrame(x, y)):
             #print(x, y, self.tile_map_size)
-            self.tile_map[x][y] = GOAL
+        #    self.tile_map[x][y] = GOAL
 
     def setOpenList(self, open_list, game_map):
         for s in open_list:
@@ -176,8 +171,8 @@ class GUI:
             return PATH_COLOR
 
     def draw(self):
-        for j in range(self.tile_map_size[0]):
-            for i in range(self.tile_map_size[1]):
+        for j in range(self.tile_map_size[1]):
+            for i in range(self.tile_map_size[0]):
                 rect = pygame.Rect(i*(self.w_block_sz+self.margin), j*(self.h_block_sz+self.margin), self.w_block_sz, self.h_block_sz)
                 pygame.draw.rect(self.display, self.getTileColor(j, i), rect)
     
@@ -185,7 +180,7 @@ class GUI:
         pygame.quit()
 
     def moveFrameDown(self, game_map):
-        self.position[1] = min(self.position[1] + 1, game_map.height)
+        self.position[1] = min(self.position[1] + 1, game_map.height - self.tile_map_size[1])
 
     def moveFrameUP(self, game_map):
         self.position[1] = max(0, self.position[1] - 1)
@@ -194,7 +189,7 @@ class GUI:
         self.position[0] = max(0, self.position[0] - 1)
 
     def moveFrameRight(self, game_map):
-        self.position[0] = min(self.position[0] + 1, game_map.width)
+        self.position[0] = min(self.position[0] + 1, game_map.width - self.tile_map_size[0])
 
     def validPosition(self, game_map):        
         self.position[0] = max(0, self.position[0])

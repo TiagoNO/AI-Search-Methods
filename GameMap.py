@@ -4,6 +4,8 @@ class GameMap:
 
     def __init__(self, filename):
         self.readFromFile(filename)
+        print("Map:", len(self.map), len(self.map[0]))
+        print(self.map)
         self.cost = 1
         self.diagonal_cost = 0.5
         self.boost_rate = 1#0.99
@@ -67,6 +69,7 @@ class GameMap:
         file_ptr.close()
 
     def getTile(self, coord):
+        #print("2: ", self.map[0])
         return self.map[coord[0]][coord[1]]
 
     def setTile(self, coord, value):

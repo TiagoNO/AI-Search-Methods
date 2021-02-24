@@ -3,6 +3,7 @@ import pygame
 import math
 
 # colors in rendering
+START_COLOR = (233, 124, 97)
 GOAL_COLOR = (233, 196, 106)
 OBSTACLES_COLOR = (42, 157, 143)
 NOT_VISITED_COLOR = (38, 70, 83)
@@ -16,13 +17,14 @@ PATH_COLOR = (110, 141, 100)
 Error_color = (0, 0, 0)
 
 # type in tilemap
-GOAL = 0
-OPEN_LIST = 1
-CLOSED_LIST = 2
-OBSTACLES = 3
-NOT_VISITED = 4
-PATH = 5
-ERROR = 6
+START = 0
+GOAL = 1
+OPEN_LIST = 2
+CLOSED_LIST = 3
+OBSTACLES = 4
+NOT_VISITED = 5
+PATH = 6
+ERROR = 7
 
 class GUI:
 
@@ -42,6 +44,7 @@ class GUI:
         self.done = False
  
         # initialize tile map
+        self.start = start
         self.goal = goal
         self.position = start
 
@@ -116,12 +119,19 @@ class GUI:
                 elif(game_map.getTile((y, x)) == '.'):
                     self.tile_map[j][i] = NOT_VISITED
 
-        #x = self.goal[0] - self.position[1]
-        #y = self.goal[1] - self.position[0]
+    def setStartAndFinish(self):
+        x = self.start[0] - self.position[1]
+        y = self.start[1] - self.position[0]
+        
+        if(self.inFrame(x, y)):
+            self.tile_map[x][y] = START
 
-        #if(self.inFrame(x, y)):
-            #print(x, y, self.tile_map_size)
-        #    self.tile_map[x][y] = GOAL
+        x = self.goal[0] - self.position[1]
+        y = self.goal[1] - self.position[0]
+
+        if(self.inFrame(x, y)):
+            self.tile_map[x][y] = GOAL            
+
 
     def setOpenList(self, open_list, game_map):
         for s in open_list:
@@ -152,7 +162,10 @@ class GUI:
 
 
     def getTileColor(self, w, h):
-        if(self.tile_map[w][h] == OPEN_LIST):
+        if(self.tile_map[w][h] == START):
+            return START_COLOR
+
+        elif(self.tile_map[w][h] == OPEN_LIST):
             return OPEN_LIST_COLOR
 
         elif(self.tile_map[w][h] == CLOSED_LIST):
@@ -169,6 +182,9 @@ class GUI:
 
         elif(self.tile_map[w][h] == PATH):
             return PATH_COLOR
+        
+        elif(self.tile_map[w][h] == ERROR):
+            return Error_color
 
     def draw(self):
         for j in range(self.tile_map_size[1]):
@@ -191,6 +207,7 @@ class GUI:
     def moveFrameRight(self, game_map):
         self.position[0] = min(self.position[0] + 1, game_map.width - self.tile_map_size[0])
 
+    # set the position of the camera in a valid position
     def validPosition(self, game_map):        
         self.position[0] = max(0, self.position[0])
         self.position[1] = max(0, self.position[1])
@@ -271,25 +288,24 @@ class GUI:
             self.step(game_map, open_list, closed_list, best_path)
 
     def step(self, game_map, open_list, closed_list, best_path):
+        # handling user events and performing the camera movements
         self.handleEvents()
         self.handleMovement(game_map)
-
-        # --- Game logic should go here
     
-        # --- Screen-clearing code goes here
+        # --- Screen-clearing code
         self.display.fill(MARGIN_COLOR)
     
-        # --- Drawing code should go here
+        # --- Drawing code
         self.validPosition(game_map)
         self.setMap(game_map)
         self.setOpenList(open_list, game_map)
         self.setClosedList(closed_list)
         if(best_path != None):
             self.setBestPath(best_path)
+        self.setStartAndFinish()
         self.draw()
-        # --- Go ahead and update the screen with what we've drawn.
+
         pygame.display.flip()
-        # --- Limit to 60 frames per second
         self.clock.tick(60)        
 
     def update(self, game_map, open_list, closed_list, best_path):

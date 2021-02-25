@@ -2,11 +2,39 @@ from heapq import *
 from State import State
 from HeuristicMetric import ManhatamDist
 
+class Node:
+    def __init__(self, state, cost, depth, parent):
+        self.state = state
+        self.cost = cost
+        self.depth = depth
+        self.parent = parent
+
+    def isGoal(self, goal_state):
+        return (self.state == goal_state)
+
+    def getParent(self):
+        return self.parent
+
+    def isRoot(self):
+        if(self.parent == None):
+            return True
+        return False 
+
+    def __le__(self, other_node):
+        if(self.cost <= other_node.cost):
+            return True
+        return False
+    
+    def __lt__(self, other_node):
+        if(self.cost < other_node.cost):
+            return True
+        return False
+
 class SearchMethod:
 
     def __init__(self, initial_state, goal):
-        self.initial_state = initial_state
-        self.current_state = None
+        self.initial_node = Node(initial_state, 0, 0, None)
+        self.current_node = None
         self.goal = goal
 
         self.open_list = []
@@ -17,24 +45,24 @@ class SearchMethod:
 
     def getPossibleMoves(self, game_map):
         possible_moves = []
-        neighbors = game_map.getNeighbors(self.current_state[1])
+        neighbors = game_map.getNeighbors(self.current_node.state)
         for n in neighbors:
             value = self.getStateValue(n)
-            possible_moves.append([value, n])
+            possible_moves.append(Node(n, value, self.current_node.depth+1, self.current_node))
         return possible_moves
 
-    def getStateValue(self, state):
-        return state.cost
+    def getStateValue(self, node):
+        return node.cost
 
-    def inClosedList(self, state):
-        if(state.coord in self.closed_list):
+    def inClosedList(self, node):
+        if(node.coord in self.closed_list):
             return False
         return True
 
-    def addClosedList(self, state):
-        self.closed_list[state[1].coord] = state[0]
+    def addClosedList(self, node):
+        self.closed_list[node.state.coord] = node.cost
 
-    def getStateFromOpenList(self):
+    def getNodeFromOpenList(self):
         # need to override!!
         print("NEED to override!!")
         return self.open_list[0]
@@ -45,33 +73,33 @@ class SearchMethod:
         # need to override!!
         #heappush(self.open_list, state)
 
-    def getNextState(self):
-        state = self.getStateFromOpenList()
-        if(state[1].coord in self.open_list_map):
-            self.open_list_map.pop(state[1].coord)
-        return state
+    def getNextNode(self):
+        node = self.getNodeFromOpenList()
+        if(node.state.coord in self.open_list_map):
+            self.open_list_map.pop(node.state.coord)
+        return node
 
-    def replaceInOpenList(self, state):
-        if(self.open_list_map[state[1].coord] > state[0]):
+    def replaceInOpenList(self, node):
+        if(self.open_list_map[node.state.coord] > node.cost):
             for i in range(0, len(self.open_list)):
-                if(self.open_list[i][1].coord == state[1].coord):
-                    self.open_list[i] = state
-                    self.open_list_map[state[1].coord] = state[0]
+                if(self.open_list[i].state == node.state):
+                    self.open_list[i] = node
+                    self.open_list_map[node.state.coord] = node.cost
                     break
 
-    def replaceFromClosedList(self, state):
-        if(self.closed_list[state[1].coord] > state[0]):
-            self.open_list.append(state)
-            self.closed_list.pop(state[1].coord)
+    def replaceFromClosedList(self, node):
+        if(self.closed_list[node.state.coord] > node.cost):
+            self.open_list.append(node)
+            self.closed_list.pop(node.state.coord)
 
-    def addState(self, state):
-        if(state[1].coord in self.open_list_map):
-            self.replaceInOpenList(state)
-        elif(state[1].coord in self.closed_list):
-            self.replaceFromClosedList(state)
+    def addNode(self, node):
+        if(node.state.coord in self.open_list_map):
+            self.replaceInOpenList(node)
+        elif(node.state.coord in self.closed_list):
+            self.replaceFromClosedList(node)
         else:
-            self.addInOpenList(state)
-            self.open_list_map[state[1].coord] = state[0]
+            self.addInOpenList(node)
+            self.open_list_map[node.state.coord] = node.cost
 
     def writePath(self, game_map):
         self.best_path  = self.getPath()
@@ -81,30 +109,30 @@ class SearchMethod:
 
     def search(self, game_map):
         while len(self.open_list) != 0:
-            self.current_state = self.getNextState()
-            self.addClosedList(self.current_state)
+            self.current_node = self.getNextNode()
+            self.addClosedList(self.current_node)
 
-            if(self.current_state[1].isGoal(self.goal)):
+            if(self.current_node.isGoal(self.goal)):
                 self.writePath(game_map)
             
             next_states = self.getPossibleMoves(game_map)
             for ns in next_states:
-                self.addState(ns)
+                self.addNode(ns)
         
         self.noSolutionMessage()
         self.found_solution = False
 
     def step(self, game_map):
-        self.current_state = self.getNextState()
-        self.addClosedList(self.current_state)
+        self.current_node = self.getNextNode()
+        self.addClosedList(self.current_node)
 
-        if(self.current_state[1].isGoal(self.goal)):
+        if(self.current_node.isGoal(self.goal)):
             self.writePath(game_map)
             return 
         
-        next_states = self.getPossibleMoves(game_map)
-        for ns in next_states:
-            self.addState(ns)
+        next_nodes = self.getPossibleMoves(game_map)
+        for ns in next_nodes:
+            self.addNode(ns)
 
         if(len(self.open_list) == 0):
             self.noSolutionMessage()
@@ -114,14 +142,25 @@ class SearchMethod:
         print(self.__str__() + ": there is no solution for the goal and map given...")
 
     def getPath(self):
-        state = self.current_state[1]
-        path = [(state.cost, state.coord)]
+        node = self.current_node
+        path = [(node.state.cost, node.state.coord)]
 
-        while not state.isRoot():
-            state = state.getParent()
-            path.append((state.cost, state.coord))
-
+        while not node.isRoot():
+            node = node.parent
+            path.append((node.state.cost, node.state.coord))
         return path
+
+    def getOpenListStates(self):
+        states = []
+        for n in self.open_list:
+            states.append(n.state)
+        return states
+
+    def getClosedListStates(self):
+        states = []
+        for n in self.closed_list:
+            states.append(n.state)
+        return states
 
     def foundPathMessage(self, path):
         print("Found an path with {} cost!!".format(path[0][0]))

@@ -20,7 +20,7 @@ Tabela de conteúdos
 
 <h1 align="" id="mapa"> Mapa </h1>
   <p align="left">
-    Os mapas utilizados são bidimensionais e representados por matrizes, e pode ser visto como um tilemap. Um jogo baseado em tilemap é àquele que consiste de pequenos blocos que formam o mapa. Cada bloco pode ter propriedades diferentes. Para a aplicação, existem apenas dois tipos: O tile de terreno, em que o agente pode andar, e o de parede, que é intransponível. Os valores na matriz são "." para representar o terreno, e "@" para as paredes. 
+    Os mapas utilizados são bidimensionais e representados por matrizes, e pode ser visto como um tilemap. Um jogo baseado em tilemap é aquele que consiste de pequenos blocos que formam o mapa. Cada bloco pode ter propriedades diferentes. Para a aplicação, existem apenas dois tipos: O tile de terreno, em que o agente pode andar, e o de parede, que é intransponível. Os valores na matriz são "." para representar o terreno, e "@" para as paredes. 
   </p>
   
   <p align="left"> 
@@ -36,7 +36,7 @@ Tabela de conteúdos
       <li><b>Estado inicial:</b> O estado em que o agente irá começar a busca;</li>
       <li><b>Ações:</b> Conjunto de possíveis ações que o agente pode executar naquele estado. No nosso caso, são os oito movimentos para blocos de terreno;</li>
       <li><b>Função de Transição:</b> Função que retorna pares de ações e estado. Ela faz a transição para o próximo estado dado a ação do agente. Ela também é chamada de função sucessora;</li>
-      <li><b>Espaço de busca:</b> Definida pelo estado inicial e função sucessora. Conjunto de todos os possíveis estados de um problema. Estado pode ser visto como as possíveis soluções para um determinado problema. Para o nosso caso, são todos as possíveis posições no mapa;</li>
+      <li><b>Espaço de busca:</b> Definida pelo estado inicial e função sucessora. Conjunto de todos os possíveis estados de um problema. Estado pode ser visto como as possíveis soluções para um determinado problema. Para o nosso caso, são todos as possíveis posições no mapa alcançaveis apartir do estado inicial;</li>
       <li><b>Teste do objetivo:</b>  Função que verifica se o estado atual é o objetivo;</li>
       <li><b>Custo da solução:</b> Cada ação possui um custo para ser executada. A solução ótima é aquela que tem o menor custo somado;</li>
     </ol>

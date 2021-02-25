@@ -29,6 +29,19 @@ Tabela de conteúdos
     
 
 <h1 align="" id="metodos"> Métodos </h1>
+  <p align="left"> 
+    Um problema de busca contêm alguns principais componentes: 
+  </p>
+  <ol>
+    <li><b>Estado inicial:</b> O estado em que o agente irá começar a busca;</li>
+    <li><b>Ações:</b> Conjunto de possíveis ações que o agente pode executar naquele estado. No nosso caso, são os oito movimentos para blocos de terreno;</li>
+    <li><b>Função de Transição:</b> Função que retorna pares de ações e estado. Ela faz a transição para o próximo estado dado a ação do agente. Ela também é chamada de função sucessora;</li>
+    <li><b>Espaço de busca:</b> Definida pelo estado inicial e função sucessora. Conjunto de todos os possíveis estados de um problema. Estado pode ser visto como as possíveis soluções para um determinado problema. Para o nosso caso, são todos as possíveis posições no mapa;</li>
+    <li><b>Teste do objetivo:</b>  Função que verifica se o estado atual é o objetivo;</li>
+    <li><b>Custo da solução:</b> Cada ação possui um custo para ser executada. A solução ótima é aquela que tem o menor custo somado;</li>
+  </ol>
+
+
   <h2 align="" id="ids"> Iterative Deepening Search </h1>
   <h2 align="" id="bfs"> Breadth-first Search </h1>
   <h2 align="" id="ucs"> Uniform-Cost Search </h1>

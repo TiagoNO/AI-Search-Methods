@@ -4,16 +4,13 @@ class GameMap:
 
     def __init__(self, filename):
         self.readFromFile(filename)
-        print("Map:", len(self.map), len(self.map[0]))
-        print(self.map)
         self.cost = 1
         self.diagonal_cost = 0.5
-        self.boost_rate = 1#0.99
+        self.boost_rate = 1
 
     def reduceCost(self):
         self.cost = self.boost_rate * self.cost
         self.diagonal_cost = self.boost_rate * self.diagonal_cost
-        #print("Cost: ", self.cost, " Diagonal cost: ", self.diagonal_cost, " Rate: ", self.boost_rate)
 
     def getNeighbors(self, state):
         neighbors = []
@@ -45,7 +42,7 @@ class GameMap:
                 if(i != 0 and j != 0):
                     cost += self.diagonal_cost
 
-                neighbors.append(State((x_axis, y_axis), 0, cost, state))
+                neighbors.append(State((x_axis, y_axis), cost))
         return neighbors
 
     def readFromFile(self, filename):

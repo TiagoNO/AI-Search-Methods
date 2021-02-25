@@ -79,9 +79,9 @@ class GUI:
         self.w_number_blocks = int(self.screen_size[0] / (self.w_block_sz + self.margin))
         self.h_number_blocks = int(self.screen_size[1] / (self.h_block_sz + self.margin))
 
-        print(self.w_block_sz, self.h_block_sz)
-        print(self.w_number_blocks, self.h_number_blocks)
-        print(self.tile_map_size, self.ratio)
+        #print(self.w_block_sz, self.h_block_sz)
+        #print(self.w_number_blocks, self.h_number_blocks)
+        #print(self.tile_map_size, self.ratio)
         self.initializeTileMap(game_map)
 
     def initializeTileMap(self, game_map):
@@ -92,8 +92,8 @@ class GUI:
                 line.append(0)
             self.tile_map.append(line)
 
-        print(self.tile_map)
-        print("AHHH:", len(self.tile_map), len(self.tile_map[0]))
+        #print(self.tile_map)
+        #print("AHHH:", len(self.tile_map), len(self.tile_map[0]))
 
         #print(self.position)
 
@@ -135,8 +135,8 @@ class GUI:
 
     def setOpenList(self, open_list, game_map):
         for s in open_list:
-            x = s[1].coord[0] - self.position[1]
-            y = s[1].coord[1] - self.position[0]
+            x = s.coord[0] - self.position[1]
+            y = s.coord[1] - self.position[0]
 
 
             if(self.inFrame(x, y)):

@@ -55,8 +55,8 @@ def parseArgs():
 args = parseArgs()
 game_map = initializeGameMap(args.map)
 
-start = State((0, 0), 0, 0, None)
-goal = State((6, 3), 0, 0, None)
+start = State((0, 0), 0)
+goal = State((6, 3), 0)
 
 use_gui = args.gui
 if(use_gui):
@@ -72,7 +72,7 @@ while True:
     finished = (finished and method.foundSolution())
 
     if(use_gui):
-        gui.update(game_map, method.open_list, method.closed_list.keys(), method.best_path)
+        gui.update(game_map, method.getOpenListStates(), method.closed_list.keys(), method.best_path)
 
     if(finished):
         break
